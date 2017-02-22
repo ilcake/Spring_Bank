@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 게시글 처리 SQL -->
+
+<mapper namespace="global.sesoc.sebank.dao.BoardMapper">
+	<!-- 게시글 저장 -->
+	<insert id="insertBoard" parameterType="Board">
+		INSERT INTO BOARD
+		(boardnum, custid, title, content,
+		inputdate, hits
+		<if test="originalfile!=null and savedfile !=null">
+			, originalfile
+			, savedfile
+		</if>
+		)
+		VALUES
+		(board_seq.nextval
+		, #{custid}
+		, #{title}
+		, #{content}
+		, sysdate
+		, 0
+		<if test="originalfile!=null and savedfile !=null">
+			, #{originalfile}
+			, #{savedfile}
+		</if>
+		)
+	</insert>
+
+
+	<!-- 글 1개 자세히 보기 -->
+	<select id="getBoard" parameterType="int" resultType="Board">
+		SELECT
+		boardnum, custid, title, content,
+		to_char(inputdate, 'YYYY/MM/DD')
+		inputdate,
+		hits, originalfile, savedfile
+		FROM BOARD
+		WHERE
+		boardnum=#{boardnum}
+	</select>
+
+
+	<!-- 조회수 카운터 늘리기 -->
+	<update id="addHits" parameterType="int">
+		UPDATE BOARD
+		SET
+		hits = hits+1
+		WHERE
+		boardnum = #{boardnum}
+	</update>
+
+	<!-- 전체 카운트 가져오기 ※검색쿼리 -->
+	<select id="getTotal" resultType="int" parameterType="map">
+		SELECT
+		COUNT(*) FROM BOARD
+		<if test="searchTitle != null and searchText!= null ">
+			<choose>
+				<when test="searchTitle == 'title' ">
+					WHERE title LIKE '%'||#{searchText}||'%'
+				</when>
+
+				<when test="searchTitle == 'content' ">
+					WHERE content LIKE '%'||#{searchText}||'%'
+				</when>
+
+				<when test="searchTitle == 'custid' ">
+					WHERE custid LIKE '%'||#{searchText}||'%'
+				</when>
+			</choose>
+		</if>
+	</select>
+
+	<!-- 글 전체 조회 ※추가 쿼리 -->
+	<select id="listBoard" parameterType="map" resultType="Board">
+		<!-- SELECT boardnum, custid, title, content, to_char(inputdate, 'MM/DD') 
+			inputdate, hits, originalfile, savedfile FROM BOARD -->
+		SELECT *
+		FROM
+		(
+		SELECT ROWNUM RNUM, B.*FROM
+		(
+		SELECT  inputdate ipd, boardnum, custid,
+		title, content, to_char(inputdate, 'MM/DD')
+		inputdate, hits,
+		originalfile, savedfile FROM BOARD
+		<if test="searchTitle != '' and searchText != '' ">
+			WHERE
+			<choose>
+				<when test="searchTitle == 'title' ">
+					title
+				</when>
+				<when test="searchTitle == 'content' ">
+					content
+				</when>
+				<when test="searchTitle == 'custid' ">
+					custid
+				</when>
+			</choose>
+			LIKE '%'||#{searchText}||'%'
+		</if>
+		ORDER BY ipd DESC
+		) B
+		)
+		WHERE RNUM BETWEEN
+		#{start} AND #{end}
+
+	</select>
+
+	<!-- 글 수정 ※FILE수정 가능 -->
+	<update id="updateBoard" parameterType="Board">
+		UPDATE BOARD
+		SET
+		title=#{title},
+		content=#{content}
+		WHERE
+		boardnum=#{boardnum}
+	</update>
+
+	<!-- 글 삭제 -->
+	<delete id="deleteBoard" parameterType="Board">
+		DELETE BOARD
+		WHERE
+		boardnum=#{boardnum}
+	</delete>
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 타입 별칭 설정 타입은 풀네임 앨리아스는 별칭 -->
+	<typeAliases>
+		<typeAlias type="global.sesoc.sebank.vo.Customer" alias="Customer" />
+		<typeAlias type="global.sesoc.sebank.vo.Board" alias="Board" />
+	</typeAliases>
+
+	<!-- 매퍼 파일 위치 설정 -->
+	<mappers>
+		<mapper resource="mappers/customerMapper.xml" />
+		<mapper resource="mappers/boardMapper.xml" />
+	</mappers>
+
+</configuration>

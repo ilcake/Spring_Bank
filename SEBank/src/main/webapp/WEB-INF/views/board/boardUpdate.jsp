@@ -6,13 +6,15 @@
 <head>
 <meta charset="UTF-8">
 <title>${board.title}</title>
+<script type="text/javascript" src="js/board.js"></script>
 </head>
 <body>
 	<div>
 		<table>
 			<tr>
 				<td>Title</td>
-				<td>${board.title}</td>
+				<td><input type="text" id="title" name="title"
+					value="${board.title}"></td>
 			</tr>
 			<tr>
 				<td>ID</td>
@@ -27,21 +29,15 @@
 				<td>${board.savedfile}</td>
 			</tr>
 			<tr>
-				<td colspan="2"><textarea cols="20" rows="5">${board.content}</textarea></td>
-			</tr>
-			<tr>
-				<td colspan="2">
-					<table>
-						<tr>
-							<td><input type="button" value="Edit"></td>
-							<td><input type="button" value="Delete"></td>
-							<td><input type="button" value="Return"
-								onclick="history.go(-1);"></td>
-						</tr>
-					</table>
-				</td>
+				<td colspan="2"><textarea name="content" id="content" cols="40"
+						rows="7">${board.content}</textarea></td>
 			</tr>
 		</table>
+		<div class="menu">
+			<input type="button" value="Delete"
+				onclick="deleteCheck(${board.boardnum});"> <input
+				type="button" value="Return" onclick="location.href='listBoard';">
+		</div>
 	</div>
 </body>
 </html>

@@ -83,7 +83,8 @@
 		(
 		SELECT ROWNUM RNUM, B.*FROM
 		(
-		SELECT  inputdate ipd, boardnum, custid,
+		SELECT inputdate ipd,
+		boardnum, custid,
 		title, content, to_char(inputdate, 'MM/DD')
 		inputdate, hits,
 		originalfile, savedfile FROM BOARD
@@ -125,5 +126,28 @@
 		DELETE BOARD
 		WHERE
 		boardnum=#{boardnum}
+	</delete>
+
+
+	<!-- 리플쓰기 -->
+	<insert id="replyWrite" parameterType="Reply">
+		INSERT INTO REPLY
+		(replynum, boardnum, custid, text, inputdate)
+		VALUES
+		(reply_seq.nextval, #{boardnum}, #{custid}, #{text}, sysdate)
+	</insert>
+
+	<!-- 리플가져오기 -->
+	<select id="listReply" resultType="Reply" parameterType="int">
+		SELECT *
+		FROM REPLY
+		WHERE
+		boardnum = #{boardnum}
+	</select>
+
+	<!-- 리플지우기 -->
+	<delete id="deleteReply" parameterType="int">
+		DELETE REPLY
+		WHERE replynum=#{replynum}
 	</delete>
 </mapper>

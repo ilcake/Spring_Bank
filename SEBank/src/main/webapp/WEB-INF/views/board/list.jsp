@@ -31,8 +31,8 @@ a:hover {
 		<h2>[ Board List ]</h2>
 
 
-		<span>전체 글 수 : ${ navi.totalRecordsCount }</span>&nbsp; <a
-			href="board/write">Write</a>
+		<span>전체 글 수 : ${ navi.totalRecordsCount }</span>&nbsp; 
+		<a href="write">Write</a>
 
 		<!-- 서버측으로 검색 데이터 전송 -->
 		<div>

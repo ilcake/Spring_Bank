@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import global.sesoc.sebank.vo.Board;
+import global.sesoc.sebank.vo.Reply;
 
 public interface BoardMapper {
 
@@ -31,5 +32,14 @@ public interface BoardMapper {
 
 	// 7) 글 삭제
 	public int deleteBoard(Board board) throws Exception;
+
+	// 리플쓰기
+	public int replyWrite(Reply reply) throws Exception;
+
+	// 리플 가져오기
+	public List<Reply> listReply(int boardnum) throws Exception;
+
+	// 리플 지우기
+	public int deleteReply(int replynum) throws Exception;
 
 }

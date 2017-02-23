@@ -13,6 +13,18 @@ public class Customer {
 	public Customer() {
 	}
 
+	public Customer(String custid, String password, String name, String email, String division, String idno,
+			String address) {
+		super();
+		this.custid = custid;
+		this.password = password;
+		this.name = name;
+		this.email = email;
+		this.division = division;
+		this.idno = idno;
+		this.address = address;
+	}
+
 	public String getCustid() {
 		return custid;
 	}

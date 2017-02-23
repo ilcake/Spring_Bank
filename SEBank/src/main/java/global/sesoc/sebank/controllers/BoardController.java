@@ -2,6 +2,8 @@ package global.sesoc.sebank.controllers;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import global.sesoc.sebank.dao.BoardRepository;
 import global.sesoc.sebank.util.PageNavigator;
 import global.sesoc.sebank.vo.Board;
+import global.sesoc.sebank.vo.Reply;
 
 @Controller
 public class BoardController {
@@ -66,9 +69,72 @@ public class BoardController {
 		logger.info("요청한 글 번호 :" + boardnum);
 		// mapper 연동.
 		Board b = repo.getBoard(boardnum);
-		model.addAttribute("board", b);
 
-		return "board/board";
+		// 리플 가져오기.
+		List<Reply> replyList = repo.listReply(boardnum);
+
+		model.addAttribute("board", b);
+		model.addAttribute("replyList", replyList);
+
+		return "board/boardDetail";
+	}
+
+	/*
+	 * 게시글 작성 화면에 대한 요청
+	 * 
+	 * @return 게시글 입력을 위한 뷰.
+	 */
+	@RequestMapping(value = "/write", method = RequestMethod.GET)
+	public String boardWrite() {
+		// mapper 연동.
+
+		return "board/boardWrite";
+	}
+
+	/*
+	 * 작성된 게시글을 DB에 저장하기 위함
+	 * 
+	 * @return 리스트.
+	 */
+	@RequestMapping(value = "/write", method = RequestMethod.POST)
+	public String Write(Board board, HttpSession session) {
+		// mapper 연동.
+		String loginId = (String) session.getAttribute("loginId");
+		board.setCustid(loginId);
+		logger.info("write ==>  " + board.toString());
+		repo.insertBoard(board);
+
+		return "redirect:listBoard";
+	}
+
+	/*
+	 * 삭제
+	 * 
+	 * @param boardnum 삭제하려고 하는 게시물의 시퀀스번호
+	 * 
+	 * @return 리스트.
+	 */
+	@RequestMapping(value = "/boardDelete", method = RequestMethod.GET)
+	public String Write(int boardnum) {
+		repo.deleteBoard(boardnum);
+		return "redirect:listBoard";
+	}
+
+	// 댓글을 DBMS에 저장하는 동작.
+	@RequestMapping(value = "/replyWrite", method = RequestMethod.POST)
+	public String replyWrite(Reply reply, HttpSession session) {
+		String user = (String) session.getAttribute("loginId");
+		reply.setCustid(user);
+		logger.info(reply.toString());
+		repo.replyWrite(reply);
+		return "redirect:board?boardnum=" + reply.getBoardnum();
+	}
+
+	// 댓글을 DBMS에 저장하는 동작.
+	@RequestMapping(value = "/replyDelete", method = RequestMethod.GET)
+	public String replyWrite(int replynum, int boardnum) {
+		repo.replyDelete(replynum);
+		return "redirect:board?boardnum=" + boardnum;
 	}
 
 }

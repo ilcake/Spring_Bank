@@ -13,6 +13,19 @@ public class Board {
 	public Board() {
 	}
 
+	public Board(int boardnum, String custid, String title, String content, String inputdate, int hits,
+			String originalfile, String savedfile) {
+		super();
+		this.boardnum = boardnum;
+		this.custid = custid;
+		this.title = title;
+		this.content = content;
+		this.inputdate = inputdate;
+		this.hits = hits;
+		this.originalfile = originalfile;
+		this.savedfile = savedfile;
+	}
+
 	public int getBoardnum() {
 		return boardnum;
 	}

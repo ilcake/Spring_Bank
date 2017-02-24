@@ -12,7 +12,7 @@
 <body>
 	<div>
 		<h2>[ Write ]</h2>
-		<form action="write" method="POST" onsubmit="return formCheck();">
+		<form action="write" method="POST" enctype="multipart/form-data">
 			<table>
 				<tr>
 					<td>Title</td>
@@ -23,12 +23,10 @@
 					<td><textArea name="content" id="content"
 							style="width: 400px; height: 200px;"></textArea></td>
 				</tr>
-				<!-- 
 				<tr>
 					<td>File</td>
 					<td><input type="file" name="upload" id="upload" /></td>
-				</tr> 
-				-->
+				</tr>
 				<tr>
 					<td colspan="2"><input type="submit" value="Write" /></td>
 				</tr>

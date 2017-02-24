@@ -31,9 +31,10 @@ a:hover {
 		<h2>[ Board List ]</h2>
 
 
-		<span>전체 글 수 : ${ navi.totalRecordsCount }</span>&nbsp; 
-		<a href="write">Write</a>
-
+		<span>전체 글 수 : ${ navi.totalRecordsCount }</span>&nbsp;
+		<c:if test="${not empty loginId }">
+			<a href="write">Write</a>
+		</c:if>
 		<!-- 서버측으로 검색 데이터 전송 -->
 		<div>
 			<form id="pagingForm" action="listBoard" method="get">

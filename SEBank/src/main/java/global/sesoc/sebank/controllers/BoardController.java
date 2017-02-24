@@ -1,7 +1,14 @@
 package global.sesoc.sebank.controllers;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -9,11 +16,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import global.sesoc.sebank.dao.BoardRepository;
+import global.sesoc.sebank.util.FileService;
 import global.sesoc.sebank.util.PageNavigator;
 import global.sesoc.sebank.vo.Board;
 import global.sesoc.sebank.vo.Reply;
@@ -28,6 +38,7 @@ public class BoardController {
 
 	final int countPerPage = 10;
 	final int pagePerGroup = 5;
+	final String uploadPath = "/boardfile"; // 파일이 업로드 되는 경로.
 
 	private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
 
@@ -97,11 +108,24 @@ public class BoardController {
 	 * @return 리스트.
 	 */
 	@RequestMapping(value = "/write", method = RequestMethod.POST)
-	public String Write(Board board, HttpSession session) {
-		// mapper 연동.
+	public String Write(MultipartFile upload, Board board, HttpSession session) {
 		String loginId = (String) session.getAttribute("loginId");
 		board.setCustid(loginId);
-		logger.info("write ==>  " + board.toString());
+
+		System.out.println(upload);
+		String savedFile = "";
+		// 첨부된 파일을 처리.
+		if (!upload.isEmpty()) {
+			FileService fs = new FileService();
+			logger.info(upload.toString());
+			savedFile = fs.saveFile(upload, uploadPath);
+			System.out.println("savedFile==" + savedFile);
+			System.out.println("OriginalFile==" + upload.getOriginalFilename());
+			board.setOriginalfile(upload.getOriginalFilename());
+			board.setSavedfile(savedFile);
+		}
+
+		logger.info("write2 ==>  " + board.toString());
 		repo.insertBoard(board);
 
 		return "redirect:listBoard";
@@ -137,4 +161,63 @@ public class BoardController {
 		return "redirect:board?boardnum=" + boardnum;
 	}
 
+	// 파일다운로드
+	@RequestMapping(value = "/download", method = RequestMethod.GET)
+	public String download(int boardnum, HttpServletResponse response) {
+		// 수동으로 다운을 시켜줘야하기때문에 리스폰스를 받아와야한다.
+
+		// boardnum에 해당하는 한개의 글 가져오기.
+		Board b = repo.getBoard(boardnum);
+		String originalFile = b.getOriginalfile();
+
+		// 사용자 측에서 다운로드 받도록 하기 위해서 response객체의 헤더를 조작한다.
+		try {
+			// Content-Disposition의 헤더를 조작해준다.
+			// 파일명이 한글일 경우를 대비하여 UTF-8로 인코딩하여 준다.
+			response.setHeader("Content-Disposition",
+					"attachment;filename=" + URLEncoder.encode(originalFile, "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		String fullpath = uploadPath + "/" + b.getSavedfile();
+
+		FileInputStream filein = null; // 서버쪽 하드에 있는 자료를 메모리에 올리기위한 inputStream
+										// (file로 주고받는다)
+		ServletOutputStream fileout = null; // 서버쪽 메모리에서 리스폰스에 올리기 위한
+											// outputStream
+		// (원격지 밖으로 나가기때문에 ServletOutputStream)
+
+		try {
+			filein = new FileInputStream(fullpath);
+			fileout = response.getOutputStream();
+
+			// Spring 에서 제공하는 유틸리티
+			FileCopyUtils.copy(filein, fileout);
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if (filein != null)
+					filein.close();
+				if (fileout != null)
+					fileout.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return null;
+	}
+
+	@RequestMapping(value = "/deleteFile", method = RequestMethod.GET)
+	public String deleteFile(String savedfile) {
+		String fullpath = "C:"+""+"boardfile"+""+ savedfile;
+		FileService.deleteFile(fullpath);
+		return null;
+	}
 }

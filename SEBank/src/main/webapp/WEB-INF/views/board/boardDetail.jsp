@@ -7,6 +7,13 @@
 <meta charset="UTF-8">
 <title>${board.title}</title>
 <script type="text/javascript" src="js/board.js"></script>
+<script type="text/javascript">
+
+function deleteFile(savedfile){
+	location.href="deleteFile?savedfile="+savedfile;	
+}
+
+</script>
 </head>
 <body>
 	<div>
@@ -23,10 +30,19 @@
 				<td>Date</td>
 				<td>${board.inputdate}</td>
 			</tr>
-			<tr>
-				<td>File</td>
-				<td>${board.savedfile}</td>
-			</tr>
+			<c:if test="${not empty board.originalfile}">
+				<tr>
+					<td>File</td>
+					<td><img width=100 height=100
+						src="download?boardnum=${board.boardnum}" />
+						${board.originalfile}
+						<button style="width: 43px; height: 22px;"
+							onclick="location.href='download?boardnum=${board.boardnum}';">다운</button>
+						<c:if test="${loginId eq board.custid}">
+							<button onclick="deleteFile('${board.savedfile}')">삭제</button>
+						</c:if></td>
+				</tr>
+			</c:if>
 			<tr>
 				<td colspan="2"><textarea cols="40" rows="7"
 						readonly="readonly">${board.content}</textarea></td>

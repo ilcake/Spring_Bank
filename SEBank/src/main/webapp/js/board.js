@@ -1,11 +1,8 @@
-/**
+/*
  * 
- */
+ * 
+*/
 
-var isEditing = false;
-
-function pagingForSubmit() {
-}
 
 function formCheck() {
 	var title = document.getElementById("title");
@@ -38,16 +35,15 @@ function replyDelete(replynum, boardnum) {
 }
 
 
-function replyUpdate(replynum) {
-	isEditing = true;
+/*function replyUpdate(replynum) {
 	alert("replyText" + replynum + "  isEditing? " + isEditing);
 	var replyText = document.getElementById("replyText" + replynum);
 	var replyButton = document.getElementById("replyButton" + replynum);
-	replyText.innerHTML = "<form><input type='text' value='${reply.text} name='text' id=''text' /></form>"
-	replyButton.innerHTML = "<input	type='button' value='edit' onclick="" /> <input
-								type='button' value='delete'onclick='' />'"
-}
-
-function replyUpdateOrder(){
+	replyText.innerHTML = "";
+	replyButton.innerHTML = "";
 	
-}
+}*/
+
+
+
+
